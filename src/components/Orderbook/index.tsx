@@ -5,6 +5,7 @@ import { ORDER_BOOK_TYPES } from "./utils";
 import { OrderbookContainer, OrderbookContent, OrderbookTitle } from "./style";
 import OrderbookTable from "./OrderbookTable";
 import { Subscription } from "centrifuge";
+import toast from "react-hot-toast";
 
 const MAX_ITEMS = 10; // For displaying and also removing excess data
 
@@ -20,6 +21,7 @@ const Orderbook = () => {
     centrifugeClient.connect();
 
     const sub = subscribeToOrderbookChannel();
+    toast.success("Successfully subscribed to channel.");
     sub.subscribe();
 
     return () => {
@@ -37,6 +39,7 @@ const Orderbook = () => {
       if (currentSequence !== 0 && data.sequence - currentSequence !== 1) {
         console.log("Data not in sequence anymore");
         unsubscribe(sub);
+        toast.error("Unsubscribed to channel.");
       } else {
         setCurrentSequence(data.sequence);
         setBids((prev) => {
