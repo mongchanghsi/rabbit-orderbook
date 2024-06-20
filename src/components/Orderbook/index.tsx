@@ -83,6 +83,7 @@ const Orderbook = () => {
   const unsubscribe = (sub: Subscription) => {
     sub.unsubscribe();
     sub.removeAllListeners();
+    centrifugeClient.removeSubscription(sub);
   };
 
   const slotAndSort = (
@@ -112,8 +113,7 @@ const Orderbook = () => {
       `orderbook:${currentMarket}`
     );
     if (currentSub) {
-      currentSub.unsubscribe();
-      centrifugeClient.removeSubscription(currentSub);
+      unsubscribe(currentSub);
     }
     resetData();
     setMarketType(newMarket);
