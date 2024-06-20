@@ -7,13 +7,15 @@ import {
   OrderbookTableItemText,
   OrderbookTableLabel,
 } from "./style";
+import { MARKET_TYPE } from "../utils";
 
 interface IProps {
+  market: MARKET_TYPE;
   orderType: ORDER_TYPE;
   orders: IPrizeSizePair[];
 }
 
-const OrderbookTable: FC<IProps> = ({ orderType, orders }) => {
+const OrderbookTable: FC<IProps> = ({ market, orderType, orders }) => {
   return (
     <OrderbookTableContainer>
       <thead>
@@ -27,7 +29,9 @@ const OrderbookTable: FC<IProps> = ({ orderType, orders }) => {
             <OrderbookTableHeader>Price ($)</OrderbookTableHeader>
           </th>
           <th>
-            <OrderbookTableHeader>Amount</OrderbookTableHeader>
+            <OrderbookTableHeader>
+              Amount ({market.replace("-USD", "")})
+            </OrderbookTableHeader>
           </th>
           <th>
             <OrderbookTableHeader>Total ($)</OrderbookTableHeader>
@@ -39,7 +43,7 @@ const OrderbookTable: FC<IProps> = ({ orderType, orders }) => {
           <OrderbookTableItem key={`${orderType}-${order[0]}`}>
             <td>
               <OrderbookTableItemText
-                textColor={orderType === ORDER_TYPE.BID ? "#28856a" : "#cc3548"}
+                textcolor={orderType === ORDER_TYPE.BID ? "#28856a" : "#cc3548"}
               >
                 {order[0]}
               </OrderbookTableItemText>

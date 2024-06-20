@@ -27,8 +27,8 @@ export const OrderbookTableItem = styled.tr`
   }
 `;
 
-export const OrderbookTableItemText = styled.p<{ textColor?: string }>`
-  color: ${({ textColor }) => (textColor ? textColor : "#808ba2")};
+export const OrderbookTableItemText = styled.p<{ textcolor?: string }>`
+  color: ${({ textcolor }) => (textcolor ? textcolor : "#808ba2")};
   padding: 4px 0;
   cursor: default;
 `;

@@ -5,11 +5,12 @@ export const OrderbookContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 12px;
 `;
 
 export const OrderbookTitle = styled.h2`
   color: #fff;
-  margin: 24px 0;
+  margin: 12px;
 `;
 
 export const OrderbookContent = styled.div`
