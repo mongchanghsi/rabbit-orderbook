@@ -7,7 +7,10 @@ export const OrderbookContainer = styled.div`
   justify-content: center;
 `;
 
-export const OrderbookTitle = styled.h2``;
+export const OrderbookTitle = styled.h2`
+  color: #fff;
+  margin: 24px 0;
+`;
 
 export const OrderbookContent = styled.div`
   display: flex;

@@ -1,6 +1,12 @@
 import { FC } from "react";
 import { IPrizeSizePair, ORDER_TYPE } from "../type";
-import { OrderbookTableContainer } from "./style";
+import {
+  OrderbookTableContainer,
+  OrderbookTableHeader,
+  OrderbookTableItem,
+  OrderbookTableItemText,
+  OrderbookTableLabel,
+} from "./style";
 
 interface IProps {
   orderType: ORDER_TYPE;
@@ -12,21 +18,41 @@ const OrderbookTable: FC<IProps> = ({ orderType, orders }) => {
     <OrderbookTableContainer>
       <thead>
         <tr>
-          <th colSpan={3}>{orderType.toUpperCase()}</th>
+          <th colSpan={3}>
+            <OrderbookTableLabel>{orderType.toUpperCase()}</OrderbookTableLabel>
+          </th>
         </tr>
         <tr>
-          <th>Price ($)</th>
-          <th>Amount</th>
-          <th>Total ($)</th>
+          <th>
+            <OrderbookTableHeader>Price ($)</OrderbookTableHeader>
+          </th>
+          <th>
+            <OrderbookTableHeader>Amount</OrderbookTableHeader>
+          </th>
+          <th>
+            <OrderbookTableHeader>Total ($)</OrderbookTableHeader>
+          </th>
         </tr>
       </thead>
       <tbody>
         {orders.map((order) => (
-          <tr key={`${orderType}-${order[0]}`}>
-            <td>{order[0]}</td>
-            <td>{order[1]}</td>
-            <td>{(+order[0] * +order[1]).toFixed(3)}</td>
-          </tr>
+          <OrderbookTableItem key={`${orderType}-${order[0]}`}>
+            <td>
+              <OrderbookTableItemText
+                textColor={orderType === ORDER_TYPE.BID ? "#28856a" : "#cc3548"}
+              >
+                {order[0]}
+              </OrderbookTableItemText>
+            </td>
+            <td>
+              <OrderbookTableItemText>{order[1]}</OrderbookTableItemText>
+            </td>
+            <td>
+              <OrderbookTableItemText>
+                {(+order[0] * +order[1]).toFixed(3)}
+              </OrderbookTableItemText>
+            </td>
+          </OrderbookTableItem>
         ))}
       </tbody>
     </OrderbookTableContainer>
