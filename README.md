@@ -46,6 +46,7 @@ For this particular project, we limit to only BTC-USD, ETH-USD and SOL-USD. The 
 ## Improvements
 
 1. Add live price chart
+2. To add initial snapshot and subsequent snapshot if orderbook sequence number is not in sequence
 
 ## References
 

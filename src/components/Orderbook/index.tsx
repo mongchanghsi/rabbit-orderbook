@@ -7,10 +7,12 @@ import OrderbookTable from "./OrderbookTable";
 import { Subscription } from "centrifuge";
 import toast from "react-hot-toast";
 import MarketSelector from "./MarketSelector";
+import { RabbitXService } from "../../service";
 
 const MAX_ITEMS = 10; // For displaying and also removing excess data
 
 const Orderbook = () => {
+  const rabbitXService = new RabbitXService();
   const [marketType, setMarketType] = useState<MARKET_TYPE>(
     MARKET_TYPE.BTC_USD
   );
@@ -31,10 +33,8 @@ const Orderbook = () => {
     sub = centrifugeClient.getSubscription(`orderbook:${marketType}`);
 
     if (!sub) {
-      sub = addSubscription();
-      toast.success("Successfully subscribed to channel.");
+      addSubscription();
     }
-    sub.subscribe();
 
     return () => {
       if (sub) {
@@ -44,18 +44,23 @@ const Orderbook = () => {
   }, [marketType]);
 
   const addSubscription = () => {
+    rabbitXService.getOrderbookSnapshot(marketType);
     const sub = centrifugeClient.newSubscription(`orderbook:${marketType}`);
+    listenToSubscription(sub);
+    sub.subscribe();
+    toast.success("Successfully subscribed to channel.");
+  };
 
+  const listenToSubscription = (sub: Subscription) => {
     sub.on("publication", (ctx) => {
       const data = ctx.data as IRabbitOrderbook;
-      console.log(data);
       if (
         currentSequence.current !== 0 &&
         data.sequence - currentSequence.current !== 1
       ) {
         console.log("Data not in sequence anymore");
         unsubscribe(sub);
-        toast.error("Unsubscribed to channel.");
+        addSubscription();
       } else {
         currentSequence.current = data.sequence;
         setBids((prev) => {
@@ -70,8 +75,6 @@ const Orderbook = () => {
         });
       }
     });
-
-    return sub;
   };
 
   const resetData = () => {
@@ -81,7 +84,9 @@ const Orderbook = () => {
   };
 
   const unsubscribe = (sub: Subscription) => {
+    resetData();
     sub.unsubscribe();
+    toast.error("Unsubscribed to channel.");
     sub.removeAllListeners();
     centrifugeClient.removeSubscription(sub);
   };
