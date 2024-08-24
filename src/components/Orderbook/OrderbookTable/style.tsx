@@ -1,4 +1,5 @@
 import { styled } from "styled-components";
+import { FlashGreen, FlashRed } from "../../Animation/flash";
 
 export const OrderbookWrapper = styled.div`
   height: 350px;
@@ -50,7 +51,9 @@ export const OrderbookTableTab = styled.span`
   color: #0b0e18;
 `;
 
-export const OrderbookTableItem = styled.tr`
+export const OrderbookTableItem = styled.tr<{ bid: number }>`
+  animation: ${({ bid }) => (bid ? FlashGreen : FlashRed)} 1s;
+
   &:hover {
     background-color: #4c546c;
   }

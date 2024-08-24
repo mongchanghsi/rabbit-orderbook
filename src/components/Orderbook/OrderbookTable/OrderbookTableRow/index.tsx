@@ -22,7 +22,10 @@ const OrderbookTableRow: FC<IProps> = ({
   const width = (currentSize * 100) / totalSize;
 
   return (
-    <OrderbookTableItem key={`${orderType}-${order[0]}`}>
+    <OrderbookTableItem
+      key={`${orderType}-${order[0]}`}
+      bid={orderType === ORDER_TYPE.BID ? 1 : 0}
+    >
       <td>
         <OrderbookTableItemText
           textcolor={orderType === ORDER_TYPE.BID ? "#28856a" : "#cc3548"}
