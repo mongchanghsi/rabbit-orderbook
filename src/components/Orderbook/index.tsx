@@ -41,7 +41,7 @@ const Orderbook = () => {
     const sub = centrifuge!.newSubscription(`orderbook:${marketType}`);
     listenToSubscription(sub);
     sub.subscribe();
-    toast.success("Successfully subscribed to channel.");
+    toast.success("Successfully subscribed to orderbook channel.");
   };
 
   const listenToSubscription = (sub: Subscription) => {
@@ -95,7 +95,7 @@ const Orderbook = () => {
     resetData();
     if (!centrifuge) return;
     sub.unsubscribe();
-    toast.error("Unsubscribed to channel.");
+    toast.error("Unsubscribed to orderbook channel.");
     sub.removeAllListeners();
     centrifuge.removeSubscription(sub);
   };
@@ -124,10 +124,14 @@ const Orderbook = () => {
   const handleUnsubscribe = (newMarket: MARKET_TYPE) => {
     if (!centrifuge) return;
     const currentMarket = marketType;
-    const currentSub = centrifuge.getSubscription(`orderbook:${currentMarket}`);
-    if (currentSub) {
-      unsubscribe(currentSub);
-    }
+    const currentOrderbookSub = centrifuge.getSubscription(
+      `orderbook:${currentMarket}`
+    );
+    const currentMarketSub = centrifuge.getSubscription(
+      `market:${currentMarket}`
+    );
+    if (currentOrderbookSub) unsubscribe(currentOrderbookSub);
+    if (currentMarketSub) unsubscribe(currentMarketSub);
     resetData();
     setMarketType(newMarket);
   };
@@ -145,7 +149,7 @@ const Orderbook = () => {
           orderType={ORDER_TYPE.BID}
           orders={bids}
         />
-        <MarketPrice />
+        <MarketPrice market={marketType} />
         <OrderbookTable
           market={marketType}
           orderType={ORDER_TYPE.ASK}

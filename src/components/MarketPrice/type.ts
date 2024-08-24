@@ -7,3 +7,8 @@ export type MarketInfoType = {
   last_trade_price: string;
   last_trade_price_direction: MARKET_DIRECTION;
 };
+
+export type IRabbitMarket = {
+  id: string;
+  last_trade_price: string;
+};
