@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import centrifugeClient from "../../websocket";
 import { IPrizeSizePair, IRabbitOrderbook, ORDER_TYPE } from "./type";
 import { MARKET_TYPE } from "./utils";
 import { OrderbookContainer, OrderbookContent, OrderbookTitle } from "./style";
@@ -7,12 +6,13 @@ import OrderbookTable from "./OrderbookTable";
 import { Subscription } from "centrifuge";
 import toast from "react-hot-toast";
 import MarketSelector from "./MarketSelector";
-import { RabbitXService } from "../../service";
+import MarketPrice from "../MarketPrice";
+import { useCentrifuge } from "../../context/useCentrifuge";
 
 const MAX_ITEMS = 10; // For displaying and also removing excess data
 
 const Orderbook = () => {
-  const rabbitXService = new RabbitXService();
+  const { centrifuge, isConnected } = useCentrifuge();
   const [marketType, setMarketType] = useState<MARKET_TYPE>(
     MARKET_TYPE.BTC_USD
   );
@@ -21,37 +21,45 @@ const Orderbook = () => {
   const currentSequence = useRef<number>(0);
 
   useEffect(() => {
-    centrifugeClient.connect();
-
-    return () => {
-      centrifugeClient.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
     let sub: Subscription | null = null;
-    sub = centrifugeClient.getSubscription(`orderbook:${marketType}`);
 
-    if (!sub) {
-      addSubscription();
+    if (centrifuge) {
+      if (isConnected) {
+        sub = centrifuge.getSubscription(`orderbook:${marketType}`);
+        if (!sub) addSubscription();
+      } else {
+        if (sub) unsubscribe(sub);
+      }
     }
 
     return () => {
-      if (sub) {
-        unsubscribe(sub);
-      }
+      if (sub) unsubscribe(sub);
     };
-  }, [marketType]);
+  }, [centrifuge, marketType]);
 
-  const addSubscription = () => {
-    rabbitXService.getOrderbookSnapshot(marketType);
-    const sub = centrifugeClient.newSubscription(`orderbook:${marketType}`);
+  const addSubscription = async () => {
+    const sub = centrifuge!.newSubscription(`orderbook:${marketType}`);
     listenToSubscription(sub);
     sub.subscribe();
     toast.success("Successfully subscribed to channel.");
   };
 
   const listenToSubscription = (sub: Subscription) => {
+    sub.on("subscribed", (ctx) => {
+      const data = ctx.data as IRabbitOrderbook;
+      currentSequence.current = data.sequence;
+      setBids(() => {
+        const output: IPrizeSizePair[] = [];
+        slotAndSort(output, data.bids);
+        return output;
+      });
+      setAsks(() => {
+        const output: IPrizeSizePair[] = [];
+        slotAndSort(output, data.asks);
+        return output;
+      });
+    });
+
     sub.on("publication", (ctx) => {
       const data = ctx.data as IRabbitOrderbook;
       if (
@@ -85,10 +93,11 @@ const Orderbook = () => {
 
   const unsubscribe = (sub: Subscription) => {
     resetData();
+    if (!centrifuge) return;
     sub.unsubscribe();
     toast.error("Unsubscribed to channel.");
     sub.removeAllListeners();
-    centrifugeClient.removeSubscription(sub);
+    centrifuge.removeSubscription(sub);
   };
 
   const slotAndSort = (
@@ -113,10 +122,9 @@ const Orderbook = () => {
   };
 
   const handleUnsubscribe = (newMarket: MARKET_TYPE) => {
+    if (!centrifuge) return;
     const currentMarket = marketType;
-    const currentSub = centrifugeClient.getSubscription(
-      `orderbook:${currentMarket}`
-    );
+    const currentSub = centrifuge.getSubscription(`orderbook:${currentMarket}`);
     if (currentSub) {
       unsubscribe(currentSub);
     }
@@ -135,12 +143,13 @@ const Orderbook = () => {
         <OrderbookTable
           market={marketType}
           orderType={ORDER_TYPE.BID}
-          orders={bids.slice(0, MAX_ITEMS)}
+          orders={bids}
         />
+        <MarketPrice />
         <OrderbookTable
           market={marketType}
           orderType={ORDER_TYPE.ASK}
-          orders={asks.slice(0, MAX_ITEMS)}
+          orders={asks}
         />
       </OrderbookContent>
     </OrderbookContainer>

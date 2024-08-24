@@ -3,3 +3,7 @@ export enum MARKET_TYPE {
   ETH_USD = "ETH-USD",
   SOL_USD = "SOL-USD",
 }
+
+export const getMarketAndCurrency = (marketType: MARKET_TYPE) => {
+  return marketType.split("-");
+}

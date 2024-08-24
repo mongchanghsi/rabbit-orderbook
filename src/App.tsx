@@ -1,6 +1,7 @@
 import { Toaster } from "react-hot-toast";
 import "./App.css";
 import Orderbook from "./components/Orderbook";
+import { CentrifugeProvider } from "./context/useCentrifuge";
 
 function App() {
   return (
@@ -11,12 +12,14 @@ function App() {
         toastOptions={{
           className: "",
           style: {
-            color: '#fff',
+            color: "#fff",
             backgroundColor: "#101624",
           },
         }}
       />
-      <Orderbook />
+      <CentrifugeProvider>
+        <Orderbook />
+      </CentrifugeProvider>
     </div>
   );
 }

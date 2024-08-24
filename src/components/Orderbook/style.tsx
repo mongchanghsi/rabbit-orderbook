@@ -15,7 +15,10 @@ export const OrderbookTitle = styled.h2`
 
 export const OrderbookContent = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: 48px;
+  gap: 4px;
+  border-radius: 8px;
+  overflow: hidden;
 `;
