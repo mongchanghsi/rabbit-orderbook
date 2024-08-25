@@ -1,7 +1,7 @@
 import { Toaster } from "react-hot-toast";
 import "./App.css";
-import Orderbook from "./components/Orderbook";
 import { CentrifugeProvider } from "./context/useCentrifuge";
+import OrderbookView from "./views/OrderbookView";
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
         }}
       />
       <CentrifugeProvider>
-        <Orderbook />
+        <OrderbookView />
       </CentrifugeProvider>
     </div>
   );
